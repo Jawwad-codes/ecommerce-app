@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieparser = require("cookie-parser");
 const cors = require("cors");
+const authRouter = require("./routes/auth/auth-Routes");
 const PORT = process.env.PORT || 5000;
 mongoose
   .connect(
@@ -14,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173/",
+    origin: "http://localhost:5173",
     method: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -28,6 +29,7 @@ app.use(
 );
 app.use(cookieparser());
 app.use(express.json());
+app.use("/api/auth/", authRouter);
 app.listen(PORT, () => {
   console.log(`server is now running on the port ${PORT}`);
 });
