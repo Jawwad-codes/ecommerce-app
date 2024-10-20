@@ -7,6 +7,14 @@ const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
 
   try {
+    const checkUser = await User.findOne({ email });
+
+    if (checkUser) {
+      return res.json({
+        success: false,
+        message: "User Already Exist With the same email please Try Again ",
+      });
+    }
     const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
@@ -30,17 +38,52 @@ const registerUser = async (req, res) => {
 };
 
 // Login
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
   try {
+    const checkUser = await User.findOne({ email });
+    if (!checkUser) {
+      return res.json({
+        success: false,
+        message: "User does't exist! please Register First",
+      });
+    }
+    const checkpasswordmatch = await bcrypt.compare(
+      password,
+      checkUser.password
+    );
+    if (!checkpasswordmatch) {
+      return res.json({
+        success: false,
+        message: "Invalid Password! please try again",
+      });
+    }
+    const token = jwt.sign(
+      {
+        id: checkUser.id,
+        email: checkUser.email,
+        role: checkUser.role,
+      },
+      "CLIENT_SECRET_KEY",
+      { expiresIn: "60m" }
+    );
+    res.cookie("token", token, { httponly: true, secure: false }).json({
+      success: true,
+      message: "Logged In Successfully",
+      user: {
+        email: checkUser.email,
+        role: checkUser.role,
+        id: checkUser.id,
+      },
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "some error occured",
     });
   }
 };
 // auth
 
 // auth-middlewhere
-module.exports = { registerUser };
+module.exports = { registerUser, loginUser };

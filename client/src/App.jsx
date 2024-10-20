@@ -16,10 +16,10 @@ import Home from "./Pages/shoppig-view/Home";
 import Listing from "./Pages/shoppig-view/Listing";
 import CheckAuth from "./components/common/CheckAuth";
 import Unauth from "./Pages/unauth-page/Unauth";
+import { useSelector } from "react-redux";
 
 const App = () => {
-  const isAuthenticated = false;
-  const user = null;
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
@@ -49,7 +49,7 @@ const App = () => {
           <Route path="features" element={<Features />} />
         </Route>
         <Route
-          path="shopping"
+          path="/shopping"
           element={
             <CheckAuth isAuthenticated={isAuthenticated} user={user}>
               <ShoppingLayout />
